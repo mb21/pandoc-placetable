@@ -1,0 +1,38 @@
+Name:                 pandoc-placetable
+Version:              0.1.0
+Build-Type:           Simple
+Synopsis:             Pandoc filter to include CSV files
+Description:          A Pandoc filter that replaces code blocks (that have the class `table`)
+                      with tables generated from CSV. The CSV is read from the code block
+                      and from an optional external CSV file and concatenated. There's a flag
+                      to enable parsing of inline markdown.
+Homepage:             https://github.com/mb21/pandoc-placetable
+Bug-Reports:          https://github.com/mb21/pandoc-placetable/issues
+License:              GPL
+License-File:         LICENSE
+Author:               Mauro Bieg
+Maintainer:           Mauro Bieg
+Copyright:            (c) 2015 Mauro Bieg
+Category:             Text
+Data-Files:           README.md
+Cabal-Version:        >=1.10
+Source-repository     head
+  type:               git
+  location:           git://github.com/mb21/pandoc-placetable.git
+
+Flag inlineMarkdown
+  Default: False
+  Description:        require entire Pandoc as a dependency and use it to compile
+                      inline markdown in the CSV and caption
+
+Executable pandoc-placetable
+  Main-Is:            pandoc-placetable.hs
+  Build-Depends:      base >=4.2 && < 5,
+                      spreadsheet >= 0.1.3 && < 0.1.4,
+                      explicit-exception == 0.1.*,
+                      pandoc-types >= 1.12.0.0
+  If flag(inlineMarkdown)
+    Build-Depends: pandoc >= 1.14.0.0
+    cpp-options: -DINLINE_MARKDOWN
+  Buildable:          True
+  Default-Language:   Haskell2010
