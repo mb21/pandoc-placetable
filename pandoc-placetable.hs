@@ -22,44 +22,35 @@ main = toJSONFilter placeTable
 
 placeTable :: Block -> IO [Block]
 placeTable (CodeBlock (_, cls, kvs) txt) | "table" `elem` cls = do
-  csv <- case lookup "file" kvs of
-           Just name -> readFile name
-           Nothing   -> return ""
-  let header = case lookup "header" kvs of
-                 Just "yes" -> True
-                 _ -> False
-  let inlinemd = case lookup "inlinemarkdown" kvs of
-                   Just "yes" -> True
-                   _ -> False
-  let toAlign c = case toUpper c of
-                    'L' -> AlignLeft
-                    'R' -> AlignRight
-                    'C' -> AlignCenter
-                    _   -> AlignDefault
-  let aligns = case lookup "aligns" kvs of
-                 Just as -> map toAlign as
-                 Nothing -> repeat AlignDefault
-  let capt = case lookup "caption" kvs of
-               Just c  -> c
-               Nothing -> ""
-  let qc   = case lookup "quotechar" kvs of
-               Just q  -> head q
-               Nothing -> '"'
-  let sep  = case lookup "delimiter" kvs of
-               Just d  -> if head d == '\\'
-                             then case head (tail d) of
-                                    't' -> '\t'
-                                    's' -> ' '
-                                    _   -> '\\'
-                             else head d
-               Nothing -> ','
+  csv <- find "file" (return "") readFile
+  let header   = find "header" False (== "yes")
+  let inlinemd = find "inlinemarkdown" False (== "yes")
+  let aligns   = find "aligns" (repeat AlignDefault) (map toAlign)
+  let capt     = find "caption" "" id
+  let qc       = find "quotechar" '"' head
+  let sep      = find "delimiter" ',' $ \d ->
+                   if head d == '\\'
+                      then case head (tail d) of
+                             't' -> '\t'
+                             's' -> ' '
+                             _   -> '\\'
+                      else head d
   let s' = if null txt
-             then csv
-             else txt ++ "\n" ++ csv
-  let s = if isSuffixOf "\n" s'
-             then s'
-             else s' ++ "\n"
+              then csv
+              else txt ++ "\n" ++ csv
+  let s  = if isSuffixOf "\n" s'
+              then s'
+              else s' ++ "\n"
   return $ toList $ csvToTable header inlinemd aligns capt qc sep s
+  where
+    find key def extract = case lookup key kvs of
+                             Just x  -> extract x
+                             Nothing -> def
+    toAlign c = case toUpper c of
+                  'L' -> AlignLeft
+                  'R' -> AlignRight
+                  'C' -> AlignCenter
+                  _   -> AlignDefault
 placeTable a = return [a]
 
 
