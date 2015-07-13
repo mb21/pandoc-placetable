@@ -91,14 +91,16 @@ csvToTable header inlinemd aligns caption qc sep s =
     cellspecs = zip aligns $ replicate cols 0
 
 #if defined(INLINE_MARKDOWN)
-    extractIns (Para ins) = ins
-    extractIns _ = []
     strToInlines s =
       if inlinemd
          then
-           case readMarkdown def s of
-                             Right (Pandoc _ bs) -> fromList $ extractIns $ head bs
-                             Left e -> str $ show e
+           -- strip newlines and wrap s in a header so only inline syntax is parsed
+           let s' = "# " ++ (concat $ lines s)
+               extractIns (Header _ _ ins) = ins
+               extractIns _ = []
+           in  case readMarkdown def s' of
+                 Right (Pandoc _ bs) -> fromList $ extractIns $ head bs
+                 Left e -> str $ show e
          else
            str s
 
