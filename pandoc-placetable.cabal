@@ -22,8 +22,8 @@ Source-repository     head
 
 Flag inlineMarkdown
   Default: False
-  Description:        require entire Pandoc as a dependency and use it to compile
-                      inline markdown in the CSV and caption
+  Description:        Require entire Pandoc as a dependency so it can be used to compile
+                      inline markdown in the CSV and caption if desired.
 
 Executable pandoc-placetable
   Main-Is:            pandoc-placetable.hs

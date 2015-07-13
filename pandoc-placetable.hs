@@ -28,6 +28,9 @@ placeTable (CodeBlock (_, cls, kvs) txt) | "table" `elem` cls = do
   let header = case lookup "header" kvs of
                  Just "yes" -> True
                  _ -> False
+  let inlinemd = case lookup "inlinemarkdown" kvs of
+                   Just "yes" -> True
+                   _ -> False
   let toAlign c = case toUpper c of
                     'L' -> AlignLeft
                     'R' -> AlignRight
@@ -37,8 +40,8 @@ placeTable (CodeBlock (_, cls, kvs) txt) | "table" `elem` cls = do
                  Just as -> map toAlign as
                  Nothing -> repeat AlignDefault
   let capt = case lookup "caption" kvs of
-               Just c  -> strToInlines c
-               Nothing -> mempty
+               Just c  -> c
+               Nothing -> ""
   let qc   = case lookup "quotechar" kvs of
                Just q  -> head q
                Nothing -> '"'
@@ -56,24 +59,26 @@ placeTable (CodeBlock (_, cls, kvs) txt) | "table" `elem` cls = do
   let s = if isSuffixOf "\n" s'
              then s'
              else s' ++ "\n"
-  return $ toList $ csvToTable header aligns capt qc sep s
+  return $ toList $ csvToTable header inlinemd aligns capt qc sep s
 placeTable a = return [a]
 
 
 -- | Convert a CSV String to a Pandoc Table
 simpleCsvToTable :: String -> Blocks
-simpleCsvToTable s = csvToTable False (repeat AlignDefault) mempty '"' ',' s
+simpleCsvToTable s = csvToTable False False (repeat AlignDefault) mempty '"' ',' s
 
 -- | Convert a bunch of options and a CSV String to a Pandoc Table
 csvToTable :: Bool        -- ^ interpret first row as headers
+           -> Bool        -- ^ interpret as inline markdown (needs inlineMarkdown compile flag)
            -> [Alignment] -- ^ table column alignments
-           -> Inlines     -- ^ table caption
+           -> String      -- ^ table caption
            -> Char        -- ^ csv quotation character like "
            -> Char        -- ^ csv field separator like ,
            -> String      -- ^ csv string to parse
            -> Blocks
-csvToTable header aligns caption qc sep s =
-  table caption cellspecs (map strToBlocks headers) $ (map . map) strToBlocks rows
+csvToTable header inlinemd aligns caption qc sep s =
+  table (strToInlines caption) cellspecs (map strToBlocks headers)
+    $ (map . map) strToBlocks rows
   where
     exc = S.fromString qc sep s
     rows' = case  exception exc of
@@ -85,26 +90,27 @@ csvToTable header aligns caption qc sep s =
     cols = if null rows' then 0 else length $ head rows'
     cellspecs = zip aligns $ replicate cols 0
 
-
-strToInlines :: String -> Inlines
-strToInlines s =
 #if defined(INLINE_MARKDOWN)
- case readMarkdown def s of
-                   Right (Pandoc _ bs) -> fromList $ extractIns $ head bs
-                   Left e -> str $ show e
-  where
     extractIns (Para ins) = ins
     extractIns _ = []
-#else
-  str s
-#endif
+    strToInlines s =
+      if inlinemd
+         then
+           case readMarkdown def s of
+                             Right (Pandoc _ bs) -> fromList $ extractIns $ head bs
+                             Left e -> str $ show e
+         else
+           str s
 
-strToBlocks :: String -> Blocks
-strToBlocks s =
-#if defined(INLINE_MARKDOWN)
-  case readMarkdown def s of
-    Right (Pandoc _ bs) -> fromList bs
-    Left e -> para $ str $ show e
+    strToBlocks s =
+      if inlinemd
+         then
+           case readMarkdown def s of
+             Right (Pandoc _ bs) -> fromList bs
+             Left e -> para $ str $ show e
+         else
+           para $ str s
 #else
-  para $ str s
+    strToInlines s = str s
+    strToBlocks  s = para $ str s
 #endif
