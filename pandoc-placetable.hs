@@ -7,6 +7,9 @@ import Control.Monad (liftM)
 import Data.Monoid (mempty)
 import Data.Char (toUpper)
 import Data.List (isSuffixOf)
+import Data.Version (showVersion)
+import Paths_pandoc_placetable (version)
+import System.Environment (getArgs)
 import Text.Pandoc.JSON
 import Text.Pandoc.Definition
 import Text.Pandoc.Builder (Inlines, Blocks, toList, fromList, table, para, str)
@@ -16,9 +19,22 @@ import Text.Pandoc.Readers.Markdown
 import Text.Pandoc.Options
 #endif
 
-
 main :: IO ()
-main = toJSONFilter placeTable
+main = do
+#if defined(INLINE_MARKDOWN)
+  let withInlineMarkdown = "with"
+#else
+  let withInlineMarkdown = "without"
+#endif
+  args <- getArgs
+  let hasArg a = a `elem` args
+  if hasArg "-v" || hasArg "--version" || hasArg "-h" || hasArg "--help"
+     then  putStrLn $ unlines [
+            "pandoc-placetable " ++ showVersion version
+          , "Compiled " ++ withInlineMarkdown ++ " the inlineMarkdown flag."
+          , "https://github.com/mb21/pandoc-placetable"
+          ]
+     else toJSONFilter placeTable
 
 placeTable :: Block -> IO [Block]
 placeTable (CodeBlock (_, cls, kvs) txt) | "table" `elem` cls = do
