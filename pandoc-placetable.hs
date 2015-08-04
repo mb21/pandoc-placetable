@@ -8,11 +8,14 @@ import Data.Monoid (mempty)
 import Data.Char (toUpper)
 import Data.List (isSuffixOf)
 import Data.Version (showVersion)
+import Network.HTTP.Conduit
 import Paths_pandoc_placetable (version)
 import System.Environment (getArgs)
 import Text.Pandoc.JSON
 import Text.Pandoc.Definition
 import Text.Pandoc.Builder (Inlines, Blocks, toList, fromList, table, para, str)
+
+import qualified Data.ByteString.Lazy.Char8 as C
 
 #if defined(INLINE_MARKDOWN)
 import Text.Pandoc.Readers.Markdown
@@ -36,9 +39,12 @@ main = do
           ]
      else toJSONFilter placeTable
 
+httpConduitManager :: IO Manager
+httpConduitManager = newManager tlsManagerSettings
+
 placeTable :: Block -> IO [Block]
 placeTable (CodeBlock (_, cls, kvs) txt) | "table" `elem` cls = do
-  csv <- find "file" (return "") readFile
+  csv <- find "file" (return "") getCsv
   let header   = find "header" False (== "yes")
   let inlinemd = find "inlinemarkdown" False (== "yes")
   let aligns   = find "aligns" (repeat AlignDefault) (map toAlign)
@@ -62,6 +68,12 @@ placeTable (CodeBlock (_, cls, kvs) txt) | "table" `elem` cls = do
     find key def extract = case lookup key kvs of
                              Just x  -> extract x
                              Nothing -> def
+    getCsv url = case parseUrl url of
+                   Nothing  -> readFile url
+                   Just req -> do
+                     mgr <- httpConduitManager
+                     res <- httpLbs req mgr
+                     return $ C.unpack $ responseBody res
     toAlign c = case toUpper c of
                   'L' -> AlignLeft
                   'R' -> AlignRight

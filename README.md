@@ -15,6 +15,9 @@ Some usage examples:
     even,"with spaces"
     ```
 
+    ```{.table file="https://docs.google.com/spreadsheets/my-publish-to-web-sheet-key&output=csv"}
+    ```
+
     ```{.table inlinemarkdown=yes}
     "when compiled with the inlineMarkdown flag","we _can_ write **Markdown** here"
     ```
@@ -28,7 +31,7 @@ Some usage examples:
     ```
 All attributes are optional and are specified as follows:
 
-- **file**: The path to the CSV file that is appended to the code block's content
+- **file**: The path or URL to the CSV file that is appended to the code block's content
 - **header**: If set to `yes`, then the first row of data is interpreted as the table headers.
 - **aligns**: For each column, one letter (L, R or C) that specifies the column's alignment.
 - **inlinemarkdown**: If set to yes, interprets the caption and CSV fields as markdown.
