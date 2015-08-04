@@ -32,7 +32,7 @@ Executable pandoc-placetable
                       explicit-exception == 0.1.*,
                       pandoc-types >= 1.12.0.0
   If flag(inlineMarkdown)
-    Build-Depends: pandoc >= 1.14.0.0
-    cpp-options: -DINLINE_MARKDOWN
+    Build-Depends:    pandoc >= 1.14.0.0
+    cpp-options:      -DINLINE_MARKDOWN
   Buildable:          True
   Default-Language:   Haskell2010
