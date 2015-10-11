@@ -34,6 +34,8 @@ All attributes are optional and are specified as follows:
 - **file**: The path or URL to the CSV file that is appended to the code block's content
 - **header**: If set to `yes`, then the first row of data is interpreted as the table headers.
 - **aligns**: For each column, one letter (L, R or C) that specifies the column's alignment.
+- **widths**: For each column, a number specifying its width as a fraction of the page width,
+  e.g. `widths="0.5 0.2 0.3"`.
 - **inlinemarkdown**: If set to yes, interprets the caption and CSV fields as markdown.
   This requires pandoc-placetable to be compiled with the `inlineMarkdown` flag (see below).
 - **caption**: The table caption.

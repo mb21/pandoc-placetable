@@ -48,6 +48,7 @@ placeTable (CodeBlock (_, cls, kvs) txt) | "table" `elem` cls = do
   let header   = find "header" False (== "yes")
   let inlinemd = find "inlinemarkdown" False (== "yes")
   let aligns   = find "aligns" (repeat AlignDefault) (map toAlign)
+  let widths   = find "widths" [] (map read . words)
   let capt     = find "caption" "" id
   let qc       = find "quotechar" '"' head
   let sep      = find "delimiter" ',' $ \d ->
@@ -63,7 +64,7 @@ placeTable (CodeBlock (_, cls, kvs) txt) | "table" `elem` cls = do
   let s  = if isSuffixOf "\n" s'
               then s'
               else s' ++ "\n"
-  return $ toList $ csvToTable header inlinemd aligns capt qc sep s
+  return $ toList $ csvToTable header inlinemd aligns widths capt qc sep s
   where
     find key def extract = case lookup key kvs of
                              Just x  -> extract x
@@ -84,18 +85,19 @@ placeTable a = return [a]
 
 -- | Convert a CSV String to a Pandoc Table
 simpleCsvToTable :: String -> Blocks
-simpleCsvToTable s = csvToTable False False (repeat AlignDefault) mempty '"' ',' s
+simpleCsvToTable s = csvToTable False False (repeat AlignDefault) [] mempty '"' ',' s
 
 -- | Convert a bunch of options and a CSV String to a Pandoc Table
 csvToTable :: Bool        -- ^ interpret first row as headers
            -> Bool        -- ^ interpret as inline markdown (needs inlineMarkdown compile flag)
            -> [Alignment] -- ^ table column alignments
+           -> [Double]    -- ^ table column widths
            -> String      -- ^ table caption
            -> Char        -- ^ csv quotation character like "
            -> Char        -- ^ csv field separator like ,
            -> String      -- ^ csv string to parse
            -> Blocks
-csvToTable header inlinemd aligns caption qc sep s =
+csvToTable header inlinemd aligns widths caption qc sep s =
   table (strToInlines caption) cellspecs (map strToBlocks headers)
     $ (map . map) strToBlocks rows
   where
@@ -106,8 +108,13 @@ csvToTable header inlinemd aligns caption qc sep s =
     (headers, rows) = if header && length rows' > 0
                          then (head rows', tail rows')
                          else ([], rows')
-    cols = if null rows' then 0 else length $ head rows'
-    cellspecs = zip aligns $ replicate cols 0
+    nrCols  = if null rows'
+                 then 0
+                 else length $ head rows'
+    widths' = if length widths == nrCols
+                 then widths
+                 else replicate nrCols 0
+    cellspecs = zip aligns widths'
 
 #if defined(INLINE_MARKDOWN)
     strToInlines s =
