@@ -13,7 +13,7 @@ import Paths_pandoc_placetable (version)
 import System.Environment (getArgs)
 import Text.Pandoc.JSON
 import Text.Pandoc.Definition
-import Text.Pandoc.Builder (Inlines, Blocks, toList, fromList, table, para, str)
+import Text.Pandoc.Builder (Inlines, Blocks, toList, fromList, table, plain, str)
 
 import qualified Data.ByteString.Lazy.Char8 as C
 
@@ -128,10 +128,10 @@ csvToTable header inlinemd aligns caption qc sep s =
          then
            case readMarkdown def s of
              Right (Pandoc _ bs) -> fromList bs
-             Left e -> para $ str $ show e
+             Left e -> plain $ str $ show e
          else
-           para $ str s
+           plain $ str s
 #else
     strToInlines s = str s
-    strToBlocks  s = para $ str s
+    strToBlocks  s = plain $ str s
 #endif
