@@ -2,8 +2,8 @@
 
 A Pandoc filter that replaces [fenced code blocks](http://pandoc.org/README.html#fenced-code-blocks)
 (that have the class `table`) with tables generated from CSV. The CSV is read from the code block
-and from an optional external CSV file and concatenated. There's an option to enable parsing of
-inline markdown.
+and from an optional external CSV file (or URL) and concatenated. There's an option to enable
+parsing of inline markdown.
 
 Some usage examples:
 
@@ -44,6 +44,9 @@ All attributes are optional and are specified as follows:
   tab and `\s` for a space.
 - **quotechar**: A one-character string that may be used in the CSV to quote fields containing
   special characters, defaults to `"`.
+
+If there is an `id` set (e.g. `{.table #my-id}`), the table will be wrapped in a `div` with
+that `id` so it can be referenced.
 
 ## Installation
 
