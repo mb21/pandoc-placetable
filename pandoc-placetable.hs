@@ -13,7 +13,14 @@ import Paths_pandoc_placetable (version)
 import System.Environment (getArgs)
 import Text.Pandoc.JSON
 import Text.Pandoc.Definition
-import Text.Pandoc.Builder (Inlines, Blocks, toList, fromList, table, plain, str)
+import Text.Pandoc.Builder ( Inlines
+                           , Blocks
+                           , toList
+                           , fromList
+                           , table
+                           , plain
+                           , str
+                           , divWith )
 
 import qualified Data.ByteString.Lazy.Char8 as C
 
@@ -43,7 +50,7 @@ httpConduitManager :: IO Manager
 httpConduitManager = newManager tlsManagerSettings
 
 placeTable :: Block -> IO [Block]
-placeTable (CodeBlock (_, cls, kvs) txt) | "table" `elem` cls = do
+placeTable (CodeBlock (ident, cls, kvs) txt) | "table" `elem` cls = do
   csv <- find "file" (return "") getCsv
   let header   = find "header" False (== "yes")
   let inlinemd = find "inlinemarkdown" False (== "yes")
@@ -64,7 +71,10 @@ placeTable (CodeBlock (_, cls, kvs) txt) | "table" `elem` cls = do
   let s  = if isSuffixOf "\n" s'
               then s'
               else s' ++ "\n"
-  return $ toList $ csvToTable header inlinemd aligns widths capt qc sep s
+  let csvTable = csvToTable header inlinemd aligns widths capt qc sep s
+  return $ toList $ if null ident
+                       then csvTable
+                       else divWith (ident,cls,[]) csvTable
   where
     find key def extract = case lookup key kvs of
                              Just x  -> extract x
