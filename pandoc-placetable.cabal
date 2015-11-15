@@ -28,7 +28,7 @@ Flag inlineMarkdown
 Executable pandoc-placetable
   Main-Is:            pandoc-placetable.hs
   Build-Depends:      base >=4.2 && < 5,
-                      bytestring >= 0.10,
+                      utf8-string >= 1.0,
                       http-conduit >= 2.1,
                       spreadsheet >= 0.1.3 && < 0.1.4,
                       explicit-exception == 0.1.*,

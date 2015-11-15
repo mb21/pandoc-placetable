@@ -4,6 +4,7 @@ module Main where
 import Data.Spreadsheet as S
 import Control.Monad.Exception.Asynchronous.Lazy as AsExc
 import Control.Monad (liftM)
+import qualified Data.ByteString.Lazy.UTF8 as U
 import Data.Monoid (mempty)
 import Data.Char (toUpper)
 import Data.List (isSuffixOf)
@@ -21,8 +22,6 @@ import Text.Pandoc.Builder ( Inlines
                            , plain
                            , str
                            , divWith )
-
-import qualified Data.ByteString.Lazy.Char8 as C
 
 #if defined(INLINE_MARKDOWN)
 import Text.Pandoc.Readers.Markdown
@@ -84,7 +83,7 @@ placeTable (CodeBlock (ident, cls, kvs) txt) | "table" `elem` cls = do
                    Just req -> do
                      mgr <- httpConduitManager
                      res <- httpLbs req mgr
-                     return $ C.unpack $ responseBody res
+                     return $ U.toString $ responseBody res
     toAlign c = case toUpper c of
                   'L' -> AlignLeft
                   'R' -> AlignRight
