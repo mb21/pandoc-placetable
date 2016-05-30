@@ -116,7 +116,7 @@ csvToTable header inlinemd aligns widths caption qc sep s =
               Just e  -> [["Error parsing CSV: " ++ e]]
     (headers, rows) = if header && length rows' > 0
                          then (head rows', tail rows')
-                         else ([], rows')
+                         else (replicate nrCols [], rows')
     nrCols  = if null rows'
                  then 0
                  else length $ head rows'
