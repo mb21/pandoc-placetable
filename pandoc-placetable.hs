@@ -137,7 +137,9 @@ csvToTable header inlinemd aligns widths caption qc sep s =
                  Right (Pandoc _ bs) -> fromList $ extractIns $ head bs
                  Left e -> str $ show e
          else
-           str s
+           if null s
+              then mempty
+              then str s
 
     strToBlocks s =
       if inlinemd
@@ -148,6 +150,7 @@ csvToTable header inlinemd aligns widths caption qc sep s =
          else
            plain $ str s
 #else
+    strToInlines [] = mempty
     strToInlines s = str s
     strToBlocks  s = plain $ str s
 #endif
