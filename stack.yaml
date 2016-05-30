@@ -1,0 +1,11 @@
+resolver: lts-5.17
+
+packages:
+- '.'
+
+extra-deps:
+  - spreadsheet-0.1.3.3
+
+flags: {}
+
+extra-package-dbs: []
