@@ -139,7 +139,7 @@ csvToTable header inlinemd aligns widths caption qc sep s =
          else
            if null s
               then mempty
-              then str s
+              else str s
 
     strToBlocks s =
       if inlinemd
