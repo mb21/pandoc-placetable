@@ -15,6 +15,7 @@ Maintainer:           Mauro Bieg
 Copyright:            (c) 2015 Mauro Bieg
 Category:             Text
 Data-Files:           README.md
+Extra-source-files:   stack.yaml
 Cabal-Version:        >=1.10
 Source-repository     head
   type:               git
