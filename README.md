@@ -59,13 +59,20 @@ that `id` so it can be referenced.
 
     git clone git@github.com:mb21/pandoc-placetable.git
     cd pandoc-placetable
-    stack install
+    stack install pandoc-placetable
+
+### The inlineMarkdown flag
 
 When compiled with the `inlineMarkdown` flag, the `inlinemarkdown=yes`option is available to
 have CSV and the caption be interpreted as markdown. Note that the flag causes Pandoc to be
 required as a dependency so it will take a while to build.
 
     cabal install -f inlineMarkdown pandoc-placetable
+
+or:
+
+    cd pandoc-placetable
+    stack install --flag pandoc-placetable:inlineMarkdown pandoc-placetable
 
 ## Usage
 
