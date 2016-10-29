@@ -71,14 +71,16 @@ placeTable (CodeBlock (ident, cls, kvs) txt) | "table" `elem` cls = do
               then s'
               else s' ++ "\n"
   let csvTable = csvToTable header inlinemd aligns widths capt qc sep s
-  return $ toList $ if null ident
+  return $ toList $ if null ident && null kvs'
                        then csvTable
-                       else divWith (ident,cls,[]) csvTable
+                       else divWith (ident,cls,kvs') csvTable
   where
     find key def extract = case lookup key kvs of
                              Just x  -> extract x
                              Nothing -> def
-    getCsv url = case parseUrl url of
+    kvs' = filter (\(k,_) -> not $ k `elem` ["file", "header", "inlinemarkdown",
+             "aligns", "widths", "caption", "quotechar", "delimiter"]) kvs
+    getCsv url = case parseUrlThrow url of
                    Nothing  -> readFile url
                    Just req -> do
                      mgr <- httpConduitManager
