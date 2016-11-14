@@ -29,9 +29,20 @@ Some usage examples:
     ```{.table file="foo.csv" header=yes aligns=LRCRR inlinemarkdown=yes
          caption="my **caption**" delimiter="," quotechar="\"" }
     ```
-All attributes are optional and are specified as follows:
 
-- **file**: The path or URL to the CSV file that is appended to the code block's content
+Alternatively, the program can be used as an ad-hoc csv-reader and run without a markdown file.
+Then the options can be provided as command-line arguments. For example:
+
+    $ pandoc-placetable --file=foo.csv --widths="0.2 0.8" | pandoc -f json -o output.html
+
+Or also:
+
+    $ cat foo.csv | pandoc-placetable --widths="0.2 0.8" | pandoc -f json -o output.html
+
+All options are optional and are specified as follows (cf. `pandoc-placetable -h`):
+
+- **csv**: The path or URL to the CSV file that is appended to the code block's content
+- **file**: synonym for `csv`
 - **header**: If set to `yes`, then the first row of data is interpreted as the table headers.
 - **aligns**: For each column, one letter (L, R or C) that specifies the column's alignment.
 - **widths**: For each column, a number specifying its width as a fraction of the page width,
