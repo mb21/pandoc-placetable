@@ -223,10 +223,13 @@ csvToTable opts csv =
     nrCols  = if null rows'
                  then 0
                  else length $ head rows'
+    calculatedWidth = if optInlineMarkdown opts
+                         then 1.0 / fromIntegral nrCols
+                         else 0 --simulate simple_table
     widths  = optWidths opts
     widths' = if length widths == nrCols
                  then widths
-                 else replicate nrCols 0
+                 else replicate nrCols calculatedWidth
     cellspecs = zip (optAligns opts) widths'
 
 #if defined(INLINE_MARKDOWN)
