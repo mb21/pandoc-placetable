@@ -255,9 +255,12 @@ csvToTable opts csv =
              Right (Pandoc _ bs) -> fromList bs
              Left e -> plain $ str $ show e
          else
-           plain $ str s
+           if null s
+              then mempty
+              else plain $ str s
 #else
     strToInlines [] = mempty
-    strToInlines s = str s
-    strToBlocks  s = plain $ str s
+    strToInlines s  = str s
+    strToBlocks  [] = mempty
+    strToBlocks  s  = plain $ str s
 #endif
