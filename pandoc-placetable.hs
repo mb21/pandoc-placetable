@@ -131,11 +131,11 @@ options =
     , Option "v" ["version"]
         (NoArg
           (\_ -> do
-            #if defined(INLINE_MARKDOWN)
+#if defined(INLINE_MARKDOWN)
             let withInlineMarkdown = "with"
-            #else
+#else
             let withInlineMarkdown = "without"
-            #endif
+#endif
             hPutStrLn stderr $ unlines [
                 "pandoc-placetable " ++ showVersion version
               , "Compiled " ++ withInlineMarkdown ++ " the inlineMarkdown flag."
