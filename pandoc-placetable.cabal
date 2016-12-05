@@ -23,6 +23,7 @@ Source-repository     head
 
 Flag inlineMarkdown
   Default: False
+  Manual:  True
   Description:        Require entire Pandoc as a dependency so it can be used to compile
                       inline markdown in the CSV and caption if desired.
 
