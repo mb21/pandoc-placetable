@@ -30,6 +30,14 @@ Some usage examples:
          caption="my **caption**" delimiter="," quotechar="\"" }
     ```
 
+
+## Usage
+
+Prepare a markdown file containing a fenced code block like the ones above, then:
+
+    pandoc --filter pandoc-placetable input.md
+
+
 Alternatively, the program can be used as an ad-hoc csv-reader and run without a markdown file.
 Then the options can be provided as command-line arguments. For example:
 
@@ -85,11 +93,6 @@ or:
     cd pandoc-placetable
     stack install --flag pandoc-placetable:inlineMarkdown pandoc-placetable
 
-## Usage
-
-Prepare a markdown file containing a fenced code block like the ones above, then:
-
-    pandoc --filter pandoc-placetable input.md
 
 ## Acknowledgments
 
