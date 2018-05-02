@@ -11,6 +11,7 @@ import Data.Maybe (fromMaybe)
 import Data.Monoid (mempty)
 import Data.Char (toUpper)
 import Data.List (isSuffixOf)
+import qualified Data.Text as T
 import Data.Version (showVersion)
 import Network.HTTP.Conduit
 import Paths_pandoc_placetable (version)
@@ -30,6 +31,7 @@ import Text.Pandoc.Builder ( Inlines
                            , divWith )
 
 #if defined(INLINE_MARKDOWN)
+import Text.Pandoc.Class (runPure)
 import Text.Pandoc.Readers.Markdown
 import Text.Pandoc.Options
 #endif
@@ -240,7 +242,7 @@ csvToTable opts csv =
            let s' = "# " ++ (concat $ lines s)
                extractIns (Header _ _ ins) = ins
                extractIns _ = []
-           in  case readMarkdown def s' of
+           in  case runPure (readMarkdown def $ T.pack s') of
                  Right (Pandoc _ bs) -> fromList $ extractIns $ head bs
                  Left e -> str $ show e
          else
@@ -251,7 +253,7 @@ csvToTable opts csv =
     strToBlocks s =
       if optInlineMarkdown opts
          then
-           case readMarkdown def s of
+           case runPure (readMarkdown def $ T.pack s) of
              Right (Pandoc _ bs) -> fromList bs
              Left e -> plain $ str $ show e
          else
