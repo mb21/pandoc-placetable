@@ -1,5 +1,5 @@
 Name:                 pandoc-placetable
-Version:              0.4.2
+Version:              0.5
 Build-Type:           Simple
 Synopsis:             Pandoc filter to include CSV files
 Description:          A Pandoc filter that replaces code blocks (that have the class `table`)
@@ -30,7 +30,7 @@ Flag inlineMarkdown
 Executable pandoc-placetable
   Main-Is:            pandoc-placetable.hs
   Build-Depends:      aeson >= 0.7,
-                      base >=4.2,
+                      base >= 4.7 && < 5,
                       bytestring >= 0.10,
                       text >= 1.2,
                       utf8-string >= 1.0,
@@ -39,7 +39,7 @@ Executable pandoc-placetable
                       explicit-exception >= 0.1.0,
                       pandoc-types >= 1.12.0.0
   If flag(inlineMarkdown)
-    Build-Depends:    pandoc >= 1.14.0.0
+    Build-Depends:    pandoc >= 2.1
     cpp-options:      -DINLINE_MARKDOWN
   Buildable:          True
   Default-Language:   Haskell2010
