@@ -32,6 +32,7 @@ import Text.Pandoc.Builder ( Inlines
 
 #if defined(INLINE_MARKDOWN)
 import Text.Pandoc.Class (runPure)
+import Text.Pandoc.Extensions (getDefaultExtensions)
 import Text.Pandoc.Readers.Markdown
 import Text.Pandoc.Options
 #endif
@@ -235,6 +236,7 @@ csvToTable opts csv =
     cellspecs = zip (optAligns opts) widths'
 
 #if defined(INLINE_MARKDOWN)
+    readerOpts = def {readerExtensions = getDefaultExtensions "markdown"}
     strToInlines s =
       if optInlineMarkdown opts
          then
@@ -242,7 +244,7 @@ csvToTable opts csv =
            let s' = "# " ++ (concat $ lines s)
                extractIns (Header _ _ ins) = ins
                extractIns _ = []
-           in  case runPure (readMarkdown def $ T.pack s') of
+           in  case runPure (readMarkdown readerOpts $ T.pack s') of
                  Right (Pandoc _ bs) -> fromList $ extractIns $ head bs
                  Left e -> str $ show e
          else
@@ -253,7 +255,7 @@ csvToTable opts csv =
     strToBlocks s =
       if optInlineMarkdown opts
          then
-           case runPure (readMarkdown def $ T.pack s) of
+           case runPure (readMarkdown readerOpts $ T.pack s) of
              Right (Pandoc _ bs) -> fromList bs
              Left e -> plain $ str $ show e
          else
