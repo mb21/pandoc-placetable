@@ -1,5 +1,5 @@
 Name:                 pandoc-placetable
-Version:              0.5
+Version:              0.5.1
 Build-Type:           Simple
 Synopsis:             Pandoc filter to include CSV files
 Description:          A Pandoc filter that replaces code blocks (that have the class `table`)
