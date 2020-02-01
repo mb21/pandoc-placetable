@@ -47,6 +47,9 @@ Or also:
 
     $ cat foo.csv | pandoc-placetable --widths="0.2 0.8" | pandoc -f json -o output.html
 
+(For this use-case, you might not even need pandoc-placetable; pandoc 2.9.2 and later ships
+with a simple built-in csv-reader: `pandoc foo.csv -o output.html`)
+
 All options are optional and are specified as follows (cf. `pandoc-placetable -h`):
 
 - **csv**: The path or URL to the CSV file that is appended to the code block's content
