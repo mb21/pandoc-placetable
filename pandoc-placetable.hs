@@ -1,4 +1,5 @@
 {-# LANGUAGE CPP #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module Main where
 import Data.Aeson (encode)
@@ -184,9 +185,9 @@ rawArgsToOpts rawArgs = do
 
 
 -- flatten key-value tuples to commandline argument-like strings
-kvsToArgs :: [(String, String)] -> [String]
+kvsToArgs :: [(T.Text, T.Text)] -> [String]
 kvsToArgs [] = []
-kvsToArgs ((k,v):rest) = ("--" ++ k) : v : (kvsToArgs rest)
+kvsToArgs ((k,v):rest) = ("--" ++ T.unpack k) : T.unpack v : (kvsToArgs rest)
 
 
 httpConduitManager :: IO Manager
@@ -197,16 +198,17 @@ placeTable :: Block -> IO [Block]
 placeTable (CodeBlock (ident, cls, kvs) txt) | "table" `elem` cls = do
   (opts, _) <- rawArgsToOpts $ kvsToArgs kvs
   csv  <- fromMaybe (return "") (optCsv opts)
-  let s = if null txt
+  let s = if T.null txt
              then csv
-             else txt ++ "\n" ++ csv
+             else T.unpack txt ++ "\n" ++ csv
   let csvTable = csvToTable opts s
-  return $ toList $ if null ident && null kvs'
+  return $ toList $ if T.null ident && null kvs'
                        then csvTable
                        else divWith (ident,cls,kvs') csvTable
   where
-    kvs' = filter (\(k,_) -> not $ elem k $ concatMap getNames options) kvs
-    getNames (Option _ ns _ _) = ns
+    kvs' = filter (\(k,_) -> k `notElem` optionNames) kvs
+    optionNames = concatMap getNames options
+    getNames (Option _ ns _ _) = map T.pack ns
 placeTable a = return [a]
 
 
@@ -264,7 +266,7 @@ csvToTable opts csv =
               else plain $ str s
 #else
     strToInlines [] = mempty
-    strToInlines s  = str s
+    strToInlines s  = str $ T.pack s
     strToBlocks  [] = mempty
-    strToBlocks  s  = plain $ str s
+    strToBlocks  s  = plain $ str $ T.pack s
 #endif
