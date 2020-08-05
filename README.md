@@ -1,5 +1,8 @@
 # pandoc-placetable filter
 
+**Note: currently only compatible with pandoc < 2.10**,
+since that release changed the way tables are represented in the document AST substantially.
+
 A Pandoc filter that replaces [fenced code blocks](http://pandoc.org/README.html#fenced-code-blocks)
 (that have the class `table`) with tables generated from CSV. The CSV is read from the code block
 and from an optional external CSV file (or URL) and concatenated. There's an option to enable
